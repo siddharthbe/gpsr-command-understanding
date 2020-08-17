@@ -84,7 +84,7 @@ class TestParsers(unittest.TestCase):
 
     def test_anonymizer(self):
         entities = (["ottoman", "apple", "bannana", "chocolates"], ["fruit", "container"], ["Bill", "bob"],
-                    ["the car", "corridor", "counter"], ["bedroom", "kitchen", "living room"], ["waving"])
+                    ["the car", "corridor", "counter"], ["bedroom", "kitchen", "living room"], ["waving"], ["a joke"])
         numbering_anonymizer = NumberingAnonymizer(*entities)
         anonymizer = Anonymizer(*entities)
         no_duplicates = "Bring me the apple from the kitchen and give it to Bill (who is waving) in the corridor"

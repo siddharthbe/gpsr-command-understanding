@@ -105,6 +105,8 @@ class GrammarBasedParser(object):
                     obfuscated_groundings = set(gen.generate_groundings(expr_builder(obf_copy), ignore_types=True))
                     anon_replacements.union(obfuscated_groundings)
                 rules[wildcard] = [expr_builder(wildcard.to_human_readable())] + list(anon_replacements)
+                if wildcard.name == "question":
+                    rules[wildcard] += [expr_builder("question")]
 
         for non_term, productions in rules.items():
             # TODO: bake this into WildCard and NonTerminal types
@@ -161,7 +163,8 @@ class KNearestNeighborParser(object):
         self.k = k
         self.metric = metric
 
-    def __call__(self, utterance):
+    def __call__(self, utterance, **kwargs):
+        verbose = "verbose" in kwargs and kwargs["verbose"]
         q = PriorityQueue()
         index = count(0)
         for neighbor, parse in self.neighbors:
@@ -177,6 +180,8 @@ class KNearestNeighborParser(object):
         answer_votes = {}
         for i in range(self.k):
             d, _, (neighbor, parse) = q.get()
+            if verbose:
+                print("{}: {}".format(neighbor, d))
             if d > self.distance_threshold:
                 continue
             answer_votes[parse] = answer_votes.get(parse, 0) + 1

@@ -56,8 +56,7 @@ class TestPairedGenerator(unittest.TestCase):
         self.assertEqual(149, len(all_2018.semantics))
 
     def test_load_2019_gpsr(self):
-        gen = PairedGenerator(None, grammar_format_version=2019)
-        load_paired(gen, "gpsr", GRAMMAR_DIR_2019)
+        gen = load_paired("gpsr", GRAMMAR_DIR_2019)
 
         rules, semantics = gen.rules, gen.semantics
         self.assertEqual(71, len(rules))
@@ -71,8 +70,7 @@ class TestPairedGenerator(unittest.TestCase):
             print("---")"""
 
     def test_load_2019_egpsr(self):
-        gen = PairedGenerator(None, grammar_format_version=2019)
-        load_paired(gen, "egpsr", GRAMMAR_DIR_2019)
+        gen = load_paired("egpsr", GRAMMAR_DIR_2019)
 
         rules, semantics = gen.rules, gen.semantics
         self.assertEqual(100, len(rules))

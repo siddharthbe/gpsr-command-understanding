@@ -8,8 +8,7 @@ from gpsr_command_understanding.parser import GrammarBasedParser, AnonymizingPar
 
 
 def main():
-    generator = Generator(None)
-    load_paired(generator, "gpsr", GRAMMAR_DIR_2019)
+    generator = load_paired("gpsr", GRAMMAR_DIR_2019)
 
     parser = GrammarBasedParser(generator.rules)
     anonymizer = NumberingAnonymizer.from_knowledge_base(generator.knowledge_base)

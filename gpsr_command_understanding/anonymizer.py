@@ -11,13 +11,14 @@ class CaseInsensitiveDict(dict):
 
 
 class Anonymizer(object):
-    def __init__(self, objects, categories, names, locations, rooms, gestures):
+    def __init__(self, objects, categories, names, locations, rooms, gestures, whattosay):
         self.names = names
         self.categories = categories
         self.locations = locations
         self.rooms = rooms
         self.objects = objects
         self.gestures = gestures
+        self.whattosay = whattosay
         replacements = CaseInsensitiveDict()
         for name in self.names:
             replacements[name] = "name"
@@ -46,6 +47,11 @@ class Anonymizer(object):
         for category in self.categories:
             replacements[category] = "category"
 
+        for whattosay in self.whattosay:
+            replacements[whattosay] = "whattosay"
+
+        replacements["objects"] = "category"
+
         self.rep = replacements
         escaped = {re.escape(k): v for k, v in replacements.items()}
         self.pattern = re.compile("\\b(" + "|".join(escaped.keys()) + ")\\b", re.IGNORECASE)
@@ -62,14 +68,15 @@ class Anonymizer(object):
             if isroom:
                 rooms.append(key)
         return Anonymizer(kb.by_name["object"], kb.by_name["category"], kb.by_name["name"], kb.by_name["location"],
-                          rooms, kb.by_name["gesture"])
+                          rooms, kb.by_name["gesture"], kb.by_name["whattosay"])
 
 
 class NumberingAnonymizer(Anonymizer):
     @staticmethod
     def from_knowledge_base(kb):
         plain = Anonymizer.from_knowledge_base(kb)
-        return NumberingAnonymizer(plain.objects, plain.categories, plain.names, plain.locations, plain.rooms, plain.gestures)
+        return NumberingAnonymizer(plain.objects, plain.categories, plain.names, plain.locations, plain.rooms,
+                                   plain.gestures, plain.whattosay)
 
     def __call__(self, utterance):
         type_count = defaultdict(lambda: 0)

@@ -156,8 +156,7 @@ class Generator:
                     for key, value in wildcard.conditions.items():
                         constraints[wildcard].add((key, value))
 
-        yield from self.__populate_with_constraints(tree, constraints, random_generator=random_generator,
-                                                    ignore_types=ignore_types)
+        yield from self.__populate_with_constraints(tree, constraints, random_generator=random_generator)
 
     def __populate_with_constraints(self, tree, constraints, random_generator=None):  # noqa: C901
         wildcards = get_wildcards(tree)
