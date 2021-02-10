@@ -9,8 +9,6 @@ from gpsr_command_understanding.generator.generator import GENERATOR_GRAMMARS
 from gpsr_command_understanding.generator.grammar import expand_shorthand, TypeConverter
 from gpsr_command_understanding.util import ParseForward
 
-GRAMMAR_DIR_2018 = "gpsr_command_understanding.resources.generator2018"
-GRAMMAR_DIR_2019 = "gpsr_command_understanding.resources.generator2019"
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
 
 

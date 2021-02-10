@@ -11,11 +11,11 @@ FIXTURE_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
 
 class TestSeq2SeqReader(AllenNlpTestCase):
 
-    def setUp(self):
-        super(TestSeq2SeqReader, self).setUp()
+    def setup(self):
+        super().setup_method()
         self.reader = Seq2SeqDatasetReader()
         instances = self.reader.read(join(FIXTURE_DIR, "train.txt"))
         self.instances = ensure_list(instances)
 
     def test_tokens(self):
-        self.assertEqual(len(self.instances), 9)
+        assert len(self.instances) == 9
