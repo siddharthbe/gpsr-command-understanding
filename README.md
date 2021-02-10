@@ -1,4 +1,4 @@
-# GPSR Command Understanding [![Build Status](https://travis-ci.org/nickswalker/gpsr-command-understanding.svg?branch=master)](https://travis-ci.org/nickswalker/gpsr-command-understanding)
+# GPSR Command Understanding ![Build Status](https://github.com/nickswalker/gpsr-command-understanding/workflows/CI/badge.svg)
 
 A semantic parser for commands from the [RoboCup@Home](http://www.robocupathome.org/) _General Purpose Service Robot_ task. 
 
