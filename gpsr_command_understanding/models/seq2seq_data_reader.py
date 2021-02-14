@@ -51,9 +51,8 @@ class Seq2SeqDatasetReader(DatasetReader):
                  source_token_indexers: Dict[str, TokenIndexer] = None,
                  target_token_indexers: Dict[str, TokenIndexer] = None,
                  source_add_start_token: bool = True,
-                 source_add_end_token: bool = True,
-                 lazy: bool = False) -> None:
-        super().__init__(lazy)
+                 source_add_end_token: bool = True) -> None:
+        super().__init__()
         self._source_tokenizer = source_tokenizer or SpacyTokenizer()
         self._target_tokenizer = target_tokenizer or SpacyTokenizer()
         self._source_token_indexers = source_token_indexers or {"tokens": SingleIdTokenIndexer()}
