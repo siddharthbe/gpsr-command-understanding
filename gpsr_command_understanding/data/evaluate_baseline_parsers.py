@@ -8,7 +8,7 @@ import editdistance
 from gpsr_command_understanding.generator.grammar import tree_printer
 from gpsr_command_understanding.generator.loading_helpers import load_paired_2018, GRAMMAR_DIR_2018
 from gpsr_command_understanding.models.noop_tokenizer import NoOpTokenizer
-from gpsr_command_understanding.models.seq2seq_data_reader import Seq2SeqDatasetReader
+from gpsr_command_understanding.models.commands_reader import CommandsDatasetReader
 from gpsr_command_understanding.parser import AnonymizingParser, KNearestNeighborParser, GrammarBasedParser
 from gpsr_command_understanding.anonymizer import NumberingAnonymizer
 from nltk.metrics.distance import jaccard_distance
@@ -69,8 +69,8 @@ def main():
     parser.add_argument("-o", "--output-path", type=str)
     args = parser.parse_args()
 
-    reader = Seq2SeqDatasetReader(source_tokenizer=NoOpTokenizer(), target_tokenizer=NoOpTokenizer(),
-                                  source_add_start_token=False, source_add_end_token=False)
+    reader = CommandsDatasetReader(source_tokenizer=NoOpTokenizer(), target_tokenizer=NoOpTokenizer(),
+                                   source_add_start_token=False, source_add_end_token=False)
     train = reader.read(args.train)
     val = reader.read(args.val)
     test = reader.read(args.test)

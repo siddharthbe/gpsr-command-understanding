@@ -114,10 +114,10 @@ class Generator:
 
     def generate_grounding_assignments(self, tree, random_generator=None, ignore_types=False):  # noqa: C901
         """
-        Generate maps from a tree's wildcards to valid entities in the knowledgebase
-        :param tree:
-        :param random_generator:
-        :param ignore_types:
+        Generate maps from a tree's wildcards to valid entities in the knowledgebase :param tree: :param
+        random_generator: :param ignore_types: Allow wildcards to be grounded without respecting the type or more
+        specific constraints. Useful when trying to produce anonymized output, as the anonymized tokens are rarely
+        more specific than the high-level class of the wildcard
         """
         wildcards = get_wildcards(tree)
         assignment = {}
@@ -156,8 +156,7 @@ class Generator:
                     for key, value in wildcard.conditions.items():
                         constraints[wildcard].add((key, value))
 
-        yield from self.__populate_with_constraints(tree, constraints, random_generator=random_generator,
-                                                    ignore_types=ignore_types)
+        yield from self.__populate_with_constraints(tree, constraints, random_generator=random_generator)
 
     def __populate_with_constraints(self, tree, constraints, random_generator=None):  # noqa: C901
         wildcards = get_wildcards(tree)

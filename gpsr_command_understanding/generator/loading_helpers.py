@@ -82,8 +82,10 @@ def load(generator, task, grammar_dir, expand_shorthand=True):
                          expand_shorthand=expand_shorthand)
 
 
-def load_paired(generator, task, grammar_dir, expand_shorthand=True):
+def load_paired(task, grammar_dir, expand_shorthand=True):
+    generator = Generator(None)
     load(generator, task, grammar_dir, expand_shorthand=expand_shorthand)
     generator = PairedGenerator.from_generator(generator)
     with importlib_resources.open_text(grammar_dir, task + "_semantics.txt") as semantics:
         generator.load_semantics_rules(semantics)
+    return generator

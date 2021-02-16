@@ -2,6 +2,7 @@ import copy
 import sys
 from itertools import zip_longest
 
+import warnings
 import importlib_resources
 from lark import Lark, exceptions, Tree, Token
 
@@ -165,11 +166,11 @@ class PairedGenerator(Generator):
                     # so it's almost certainly an error
                     probably_should_be_filled = sem_placeholders_remaining.difference(sentence_placeholders_remaining)
                     if len(probably_should_be_filled) > 0:
-                        print("Unfilled placeholders {}".format(" ".join(map(str, probably_should_be_filled))))
-                        print(tree_printer.transform(sentence))
-                        print(tree_printer.transform(semantics))
-                        print("This annotation is probably wrong")
-                        print("")
+                        output = "Unfilled placeholders {}".format(" ".join(map(str, probably_should_be_filled)))
+                        output += tree_printer.transform(sentence) + "\n"
+                        output += tree_printer.transform(semantics) + "\n"
+                        output += "This annotation is probably wrong" + "\n"
+                        warnings.warn(output)
                         continue
                     elif len(sem_placeholders_remaining) != len(sentence_placeholders_remaining):
                         quiet = False
@@ -181,12 +182,11 @@ class PairedGenerator(Generator):
                         if len(not_in_annotation) == 1 and WildCard("pron") in not_in_annotation:
                             quiet = True
                         if not quiet:
-                            print(
-                                "Annotation is missing wildcards that are present in the original sentence. Were they left out accidentally?")
-                            print(" ".join(map(str, not_in_annotation)))
-                            print(tree_printer.transform(sentence))
-                            print(tree_printer.transform(semantics))
-                            print("")
+                            output = "Annotation is missing wildcards that are present in the original sentence. Were they left out accidentally?\n "
+                            output += " ".join(map(str, not_in_annotation)) + "\n"
+                            output += tree_printer.transform(sentence) + "\n"
+                            output += tree_printer.transform(semantics) + "\n"
+                            warnings.warn(output)
                 elif yield_requires_semantics:
                     # This won't be a pair without semantics, so we'll just skip it
                     continue

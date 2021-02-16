@@ -7,7 +7,7 @@ from os.path import join
 import re
 
 from gpsr_command_understanding.generator.grammar import tree_printer
-from gpsr_command_understanding.generator.loading_helpers import load, GRAMMAR_YEAR_TO_MODULE
+from gpsr_command_understanding.generator.loading_helpers import load, GRAMMAR_YEAR_TO_MODULE, load_paired
 from gpsr_command_understanding.generator.tokens import ROOT_SYMBOL
 from gpsr_command_understanding.generator.paired_generator import pairs_without_placeholders, PairedGenerator
 
@@ -31,8 +31,7 @@ def main():
     task = sys.argv[2]
     out_root = os.path.abspath(os.path.dirname(__file__) + "/../../data/")
 
-    generator = PairedGenerator(None, grammar_format_version=year)
-    load(generator, task, GRAMMAR_YEAR_TO_MODULE[year])
+    generator = load_paired(task, GRAMMAR_YEAR_TO_MODULE[year])
 
     sentences = [pair[0] for pair in
                  generator.generate(ROOT_SYMBOL, yield_requires_semantics=False)]
@@ -50,8 +49,8 @@ def main():
 
     annotated, unannotated, out_of_grammar = get_annotated_sentences((sentences, all_pairs))
 
-    unique_sentence_parses = [all_pairs[ann_sen] for ann_sen in annotated]
-    unique_sentence_parses = [set(x) for x in unique_sentence_parses]
+    unique_sentence_parses = [baked_pairs[ann_sen] for ann_sen in annotated]
+    unique_sentence_parses = set(unique_sentence_parses)
 
     out_path = join(out_root, "{}_{}_pairs.txt".format(year, task))
 
@@ -65,7 +64,7 @@ def main():
         f.write("{0}/{1} {2:.1f}%\n".format(len(annotated), len(baked_sentences),
                                             100.0 * len(annotated) / len(baked_sentences)))
         f.write("\t unique parses: {}\n".format(len(unique_sentence_parses)))
-        sen_lengths = [len(sentence.split()) for sentence, logical in baked_pairs]
+        sen_lengths = [len(sentence.split()) for sentence in baked_pairs.keys()]
         avg_sentence_length = np.mean(sen_lengths)
         parse_lengths = []
         filtered_parse_lengths = []

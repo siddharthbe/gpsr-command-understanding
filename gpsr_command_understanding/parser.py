@@ -105,6 +105,8 @@ class GrammarBasedParser(object):
                     obfuscated_groundings = set(gen.generate_groundings(expr_builder(obf_copy), ignore_types=True))
                     anon_replacements.union(obfuscated_groundings)
                 rules[wildcard] = [expr_builder(wildcard.to_human_readable())] + list(anon_replacements)
+                if wildcard.name == "question":
+                    rules[wildcard] += [expr_builder("question")]
 
         for non_term, productions in rules.items():
             # TODO: bake this into WildCard and NonTerminal types
@@ -161,7 +163,8 @@ class KNearestNeighborParser(object):
         self.k = k
         self.metric = metric
 
-    def __call__(self, utterance):
+    def __call__(self, utterance, **kwargs):
+        verbose = "verbose" in kwargs and kwargs["verbose"]
         q = PriorityQueue()
         index = count(0)
         for neighbor, parse in self.neighbors:
@@ -177,6 +180,8 @@ class KNearestNeighborParser(object):
         answer_votes = {}
         for i in range(self.k):
             d, _, (neighbor, parse) = q.get()
+            if verbose:
+                print("{}: {}".format(neighbor, d))
             if d > self.distance_threshold:
                 continue
             answer_votes[parse] = answer_votes.get(parse, 0) + 1
@@ -213,11 +218,19 @@ class AnonymizingParser(object):
         self.parser = parser
         self.anonymizer = anonymizer
 
-    def __call__(self, utterance, **kwargs):
+    def __call__(self, utterance, attempt_deanon=True, **kwargs):
+        anonymized, replacements = self.anonymizer(utterance, return_replacements=True)
+        anon_parse = self.parser(anonymized, **kwargs)
+        parse = anon_parse
+        if attempt_deanon:
+            for orig, replacements in replacements.items():
+                for replacement in replacements:
+                    parse = parse.replace(replacement, orig, 1)
+
         if "verbose" in kwargs and kwargs["verbose"]:
-            print("Anonymized to " + self.anonymizer(utterance))
-        anon_parse = self.parser(self.anonymizer(utterance), **kwargs)
-        if anon_parse:
-            return anon_parse
+            print("Anonymized to " + anonymized)
+            print("Got anonymous parse " + anon_parse)
+        if parse:
+            return parse
         # Maybe anonymization is catching a word it shouldn't and moving the sentence outside the grammar. Try without
         return self.parser(utterance, **kwargs)

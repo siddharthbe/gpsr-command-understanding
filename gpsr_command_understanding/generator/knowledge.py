@@ -76,12 +76,21 @@ class AnonymizedKnowledgebase:
         rooms = ["room" + str(i) for i in range(3)]
         self.by_name = {name: [name + str(i) for i in range(3)] for name in names}
         self.by_name["location"] += rooms
-        self.attributes = {"object": {"type": defaultdict(lambda: True),
+        self.attributes = {"object": {"type": defaultdict(lambda: "known"),
                                       "category": defaultdict(lambda: "category1")},
                            "location": {"isplacement": defaultdict(lambda: True),
                                         "isbeacon": defaultdict(lambda: True),
                                         "isroom": defaultdict(lambda: False),
                                         "in": defaultdict(lambda: "room1")},
-                           "category": {"singular": {x:  x for x in self.by_name["category"]}}}
+                           "category": {"singular": {x: x for x in self.by_name["category"]}}}
         for room in rooms:
             self.attributes["location"]["isroom"][room] = True
+
+        # Make sure the defaultdicts have concrete values set for all the known keys
+        for object in self.by_name["object"]:
+            self.attributes["object"]["type"][object]
+            self.attributes["object"]["category"][object]
+        for location in self.by_name["location"]:
+            self.attributes["location"]["isplacement"][location]
+            self.attributes["location"]["isbeacon"][location]
+            self.attributes["location"]["in"][location]

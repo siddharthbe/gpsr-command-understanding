@@ -1,6 +1,6 @@
 {
   "dataset_reader": {
-    "type": "my_seq2seq",
+    "type": "commands",
     "source_token_indexers": {
       "source_tokens": {
         "type": "single_id",

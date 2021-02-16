@@ -1,4 +1,4 @@
-name: Python package
+name: CI
 
 on: [push, pull_request]
 
@@ -28,4 +28,4 @@ jobs:
           flake8 .
       - name: Test with pytest
         run: |
-          python -m unittest discover
+          pytest test

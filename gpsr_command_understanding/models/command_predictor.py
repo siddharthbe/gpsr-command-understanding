@@ -9,6 +9,9 @@ from allennlp.predictors.predictor import Predictor
 class CommandParser(Predictor):
     """Predictor wrapper for the CommandParser"""
 
+    def predict_text(self, text: str) -> JsonDict:
+        return self.predict_instance(self._dataset_reader.text_to_instance(source_string=text))
+
     def predict_instance(self, instance: Instance) -> JsonDict:
         self._model.vocab.extend_from_instances([instance])
         # Pretrained transformer embedders don't have an extend method, so this won't do anything to them
