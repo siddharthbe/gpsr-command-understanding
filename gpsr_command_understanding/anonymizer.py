@@ -12,6 +12,18 @@ class CaseInsensitiveDict(dict):
 
 class Anonymizer(object):
     def __init__(self, objects, categories, names, locations, rooms, gestures, whattosay):
+        """
+        Give the entities that will be anonymized. Matching and replacement is
+        case insensitive.
+        
+        :param objects: 
+        :param categories: 
+        :param names: 
+        :param locations: 
+        :param rooms: 
+        :param gestures: 
+        :param whattosay: 
+        """
         self.names = names
         self.categories = categories
         self.locations = locations
@@ -52,12 +64,28 @@ class Anonymizer(object):
 
         replacements["objects"] = "category"
 
-        self.rep = replacements
+        self.replacements = replacements
         escaped = {re.escape(k): v for k, v in replacements.items()}
         self.pattern = re.compile("\\b(" + "|".join(escaped.keys()) + ")\\b", re.IGNORECASE)
 
-    def __call__(self, utterance):
-        return self.pattern.sub(lambda m: self.rep[m.group(0)], utterance)
+    def __call__(self, utterance, return_replacements=False):
+        """
+        Replaces entity occurrences with their specified replacement string (usually a type token).
+        "apple apple banana" -> "object object object"
+        :param utterance: 
+        :param return_replacements: 
+        :return: 
+        """
+        anonymized = utterance
+        replacements = defaultdict(lambda: set())
+        for match in self.pattern.finditer(utterance):
+            match_str = match.group()
+            replacements[match_str].add(self.replacements[match_str])
+            anonymized = anonymized.replace(match_str, self.replacements[match_str])
+        if return_replacements:
+            return anonymized, replacements
+        else:
+            return anonymized
 
     @staticmethod
     def from_knowledge_base(kb):
@@ -78,25 +106,34 @@ class NumberingAnonymizer(Anonymizer):
         return NumberingAnonymizer(plain.objects, plain.categories, plain.names, plain.locations, plain.rooms,
                                    plain.gestures, plain.whattosay)
 
-    def __call__(self, utterance):
-        type_count = defaultdict(lambda: 0)
-        scrubbed = utterance
-        for match in self.pattern.finditer(utterance):
-            type = self.rep[match.group()]
-            type_count[type] += 1
-
+    def __call__(self, utterance, return_replacements=False):
+        """
+        Replaces entities with some other token (usually a type token) with a number appended.
+        "apple apple" -> "object0 object1"
+        "apple banana" -> "object0 object1"
+        We expect objects to be referred to once in commands, thus the decision to allow even the same
+        word to be mapped to multiple numbers. We assume that a repeated occurrence is actually a 
+        separate entity with the same name. 
+        :param utterance: 
+        :param return_replacements: 
+        :return: 
+        """
+        anonymized = utterance
+        replacements = defaultdict(lambda: set())
         num_type_anon_so_far = defaultdict(lambda: 0)
         while True:
-            match = self.pattern.search(scrubbed)
+            match = self.pattern.search(anonymized)
             if not match:
                 break
-            string = match.groups()[0]
-            replacement_type = self.rep[string]
+            string = match.group()
+            replacement_type = self.replacements[string]
 
             current_num = num_type_anon_so_far[replacement_type]
-            replacement_string = self.rep[string] + str(current_num)
+            replacement_string = self.replacements[string] + str(current_num)
             num_type_anon_so_far[replacement_type] += 1
-
-            scrubbed = scrubbed.replace(string, replacement_string, 1)
-
-        return scrubbed
+            replacements[string].add(replacement_string)
+            anonymized = anonymized.replace(string, replacement_string, 1)
+        if return_replacements:
+            return anonymized, replacements
+        else:
+            return anonymized

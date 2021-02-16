@@ -85,7 +85,7 @@ class TestParsers(unittest.TestCase):
         self.assertEqual(expected_parse, nearest_neighbor_parser(tweaked))
 
     def test_anonymizer(self):
-        entities = (["ottoman", "apple", "bannana", "chocolates"], ["fruit", "container"], ["Bill", "bob"],
+        entities = (["ottoman", "apple", "banana", "chocolates"], ["fruit", "container"], ["Bill", "bob"],
                     ["the car", "corridor", "counter"], ["bedroom", "kitchen", "living room"], ["waving"], ["a joke"])
         numbering_anonymizer = NumberingAnonymizer(*entities)
         anonymizer = Anonymizer(*entities)
@@ -95,6 +95,10 @@ class TestParsers(unittest.TestCase):
         duplicates = "Bring the apple from the kitchen and put it next to the other apple in the bedroom"
         self.assertEqual(anonymizer(duplicates),
                          "Bring the object from the room and put it next to the other object in the room")
+
+        type_duplicates = "Bring the apple and the banana from the kitchen and bedroom"
+        self.assertEqual(anonymizer(type_duplicates),
+                         "Bring the object and the object from the room and room")
         self.assertEqual(
             numbering_anonymizer(duplicates),
             "Bring the object0 from the room0 and put it next to the other object1 in the room1")
@@ -126,7 +130,7 @@ class TestParsers(unittest.TestCase):
         succeeded = 0
         for tree, parse in itertools.islice(pairs, num_tested):
             sentence = tree_printer(tree)
-            parsed = parser(sentence)
+            parsed = parser(sentence, attempt_deanon=False)
             if parsed:
                 succeeded += 1
             else:
@@ -154,7 +158,7 @@ class TestParsers(unittest.TestCase):
         for tree, parse in itertools.islice(pairs, num_tested):
             ground_sen, _ = generator.ground((tree, parse))
             sentence = tree_printer(ground_sen)
-            parsed = parser(sentence)
+            parsed = parser(sentence, attempt_deanon=False)
             if parsed:
                 succeeded += 1
             else:

@@ -218,11 +218,19 @@ class AnonymizingParser(object):
         self.parser = parser
         self.anonymizer = anonymizer
 
-    def __call__(self, utterance, **kwargs):
+    def __call__(self, utterance, attempt_deanon=True, **kwargs):
+        anonymized, replacements = self.anonymizer(utterance, return_replacements=True)
+        anon_parse = self.parser(anonymized, **kwargs)
+        parse = anon_parse
+        if attempt_deanon:
+            for orig, replacements in replacements.items():
+                for replacement in replacements:
+                    parse = parse.replace(replacement, orig, 1)
+
         if "verbose" in kwargs and kwargs["verbose"]:
-            print("Anonymized to " + self.anonymizer(utterance))
-        anon_parse = self.parser(self.anonymizer(utterance), **kwargs)
-        if anon_parse:
-            return anon_parse
+            print("Anonymized to " + anonymized)
+            print("Got anonymous parse " + anon_parse)
+        if parse:
+            return parse
         # Maybe anonymization is catching a word it shouldn't and moving the sentence outside the grammar. Try without
         return self.parser(utterance, **kwargs)
