@@ -3,7 +3,6 @@ local HIDDEN_SIZE = 200;
 std.mergePatch(common_parameters,
 {
   dataset_reader: {
-    type: 'my_seq2seq',
     target_tokenizer: {
       type: 'just_spaces',
     },

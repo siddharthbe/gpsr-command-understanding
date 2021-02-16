@@ -17,8 +17,8 @@ import more_itertools
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
-@DatasetReader.register("my_seq2seq")
-class Seq2SeqDatasetReader(DatasetReader):
+@DatasetReader.register("commands")
+class CommandsDatasetReader(DatasetReader):
     """
     Read a tsv file containing paired sequences, and create a dataset suitable for a
     ``SimpleSeq2Seq`` model, or any model with a matching API.
